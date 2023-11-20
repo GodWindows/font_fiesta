@@ -3,10 +3,10 @@
 Welcome to the ultimate font-tastic adventure! Tired of manually installing fonts one by one? Say goodbye to font installation headaches with **Font Fiesta Unzipper Extravaganza!** 🚀
 
 ## 🎁 What's Inside?
-Unleash the font party by simply dropping a folder on our magical tool. **Font Fiesta Unzipper Extravaganza** will gracefully unzip and install all the .ttf fonts present, turning your font collection into a dazzling display of typographic brilliance. 🌈✨
+Unleash the font party by simply selecting a folder on our magical tool. **Font Fiesta Unzipper Extravaganza** will gracefully unzip and install all the .ttf fonts present, turning your font collection into a dazzling display of typographic brilliance. 🌈✨
 
 ## 💃 Easy-Peasy Unzipping:
-No more tedious clicks! Just drag, drop, and watch the **Font Fiesta** unfold. Your fonts will be unzipped and ready to rock in no time.
+No more tedious clicks! Just choose your folder and watch the **Font Fiesta** unfold. Your fonts will be unzipped and ready to rock in no time.
 
 ## 🎨 Style with Ease:
 Express your creativity effortlessly as **Font Fiesta Unzipper Extravaganza** ensures all your favorite fonts are at your fingertips. Design projects, presentations, or documents with the perfect typeface without the hassle.

@@ -1,6 +1,7 @@
 import os
 import ctypes
 import ctypes.wintypes
+import argparse
 import zipfile
 from py7zr import SevenZipFile
 
@@ -33,6 +34,7 @@ def unzip_files_in_directory(directory):
 
 def install_fonts_in_directory(directory):
     font_extensions = (".ttf", ".otf", ".fon", ".fnt")
+    nb_fonts_installed = 0
 
     for root, dirs, files in os.walk(directory):
         for filename in files:
@@ -42,17 +44,32 @@ def install_fonts_in_directory(directory):
                 if result == 0:
                     print(f"Failed to install font: {font_path}")
                 else:
+                    nb_fonts_installed+= 1
                     print(f"Installed font: {font_path}")
-
+    if nb_fonts_installed == 0:
+        print("No font have been installed :(")
+    else:
+        print("We just installed", nb_fonts_installed, "font(s). Awesome!")
     # Notify the system that the font cache has changed
     hwnd_broadcast = 0xFFFF
     wm_fontchange = 0x001D
     ctypes.windll.user32.SendMessageW(hwnd_broadcast, wm_fontchange, 0, 0)
 
+def main():
+    parser = argparse.ArgumentParser(description="Install fonts from a specified folder.")
+    parser.add_argument("folder_path", help="Path to the folder containing font files (.ttf, etc.)")
+
+    args = parser.parse_args()
+
+    folder_path = args.folder_path
+
+    if not os.path.exists(folder_path):
+        print(f"Error: The specified folder path '{folder_path}' does not exist.")
+        return
+
+    unzip_files_in_directory(folder_path)
+
+    install_fonts_in_directory(folder_path)
+
 if __name__ == "__main__":
-    current_directory = os.getcwd()
-
-    # Unzip files before font installation
-    unzip_files_in_directory(current_directory)
-
-    install_fonts_in_directory(current_directory)
+    main()

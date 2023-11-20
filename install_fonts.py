@@ -5,7 +5,7 @@ import zipfile
 from py7zr import SevenZipFile
 
 def unzip_files_in_directory(directory):
-    zip_extensions = (".zip", ".7z")
+    zip_extensions = (".zip", ".7z") 
 
     for root, dirs, files in os.walk(directory):
         for filename in files:

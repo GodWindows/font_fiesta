@@ -1,11 +1,19 @@
 import os
 import ctypes
-import ctypes.wintypes
-import sys
 import tkinter as tk
-import zipfile
-from py7zr import SevenZipFile
 from tkinter import filedialog
+from tkinterdnd2 import TkinterDnD, DND_FILES
+from py7zr import SevenZipFile
+from zipfile import ZipFile
+import sys
+def on_drag_enter():
+    print("Drag entered!")
+
+def on_drag_leave():
+    print("Drag left!")
+
+def on_drag_motion():
+    print("Drag in motion!")
 
 def unzip_files_in_directory(directory):
     zip_extensions = (".zip", ".7z") 
@@ -19,7 +27,7 @@ def unzip_files_in_directory(directory):
                 try:
                     # Check if it's a ZIP file
                     if zip_file_path.endswith(".zip"):
-                        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+                        with ZipFile(zip_file_path, 'r') as zip_ref:
                             zip_ref.extractall(extract_path)
 
                     # Check if it's a 7z file
@@ -46,12 +54,14 @@ def install_fonts_in_directory(directory):
                 if result == 0:
                     print(f"Failed to install font: {font_path}")
                 else:
-                    nb_fonts_installed+= 1
+                    nb_fonts_installed += 1
                     print(f"Installed font: {font_path}")
+
     if nb_fonts_installed == 0:
-        print("No font have been installed :(")
+        print("No fonts have been installed :(")
     else:
         print("We just installed", nb_fonts_installed, "font(s). Awesome!")
+
     # Notify the system that the font cache has changed
     hwnd_broadcast = 0xFFFF
     wm_fontchange = 0x001D
@@ -60,16 +70,29 @@ def install_fonts_in_directory(directory):
 def choose_folder(label):
     # Open a dialog for selecting a folder
     folder_path = filedialog.askdirectory()
-    
+
     # Check if a folder was selected
     if folder_path:
         print(f"Selected Folder: {folder_path}")
         label.config(text=f"Selected Folder: {folder_path}")
+        unzip_files_in_directory(folder_path)
+        install_fonts_in_directory(folder_path)
     else:
         print("No folder selected.")
 
+def on_drop(event, label):
+    data = event.data
+    if data:
+        folder_path = data
+        print(f"Dropped Folder: {folder_path}")
+        label.config(text=f"Dropped Folder: {folder_path}")
+        unzip_files_in_directory(folder_path)
+        install_fonts_in_directory(folder_path)
+    else:
+        print("No folder dropped.")
+
 def gui():
-    root = tk.Tk()
+    root = TkinterDnD.Tk()
     root.title("Font Fiesta Unzipper And Installer Extravaganza 🎉🔤")
     # Set the initial size of the window
     root.geometry("800x400")
@@ -79,16 +102,40 @@ def gui():
     label.pack(pady=10)
 
     # Create a label to show the selected directory's path
-    dir = tk.Label(root, text=" ")
+    dir_label = tk.Label(root, text=" ")
+    dir_label.pack(pady=10)
+
     # Create a button widget
-    button = tk.Button(root, text="Choose Folder", command=lambda: choose_folder(dir))
+    button = tk.Button(root, text="Choose Folder", command=lambda: choose_folder(dir_label))
     button.pack()
 
-    dir.pack(pady=10)
+    # Create a label for the drag-and-drop area
+    drag_label = tk.Label(root, text="Or drag and drop a folder in the circle below:")
+    drag_label.pack(pady=10)
+
+    # Create a frame as a circular drag-and-drop area
+    drag_area = tk.Frame(root, width=200, height=200, background="green", highlightthickness=0, highlightbackground="gray", bd=0, borderwidth=0)
+    drag_area.pack(pady=10)
+    drag_area.place(relx=0.5, rely=0.5, anchor="center", x=0, y=50)
+    drag_area.pack_propagate(False)
+
+    # Create a circular canvas inside the frame
+    canvas = tk.Canvas(drag_area, width=210, height=210, bg="#f0f0f0", highlightthickness=0)
+    canvas.pack(fill="both", expand=True )
+    canvas.place(relx=0.5, rely=1.0, anchor='s', y=0)
+
+    # Create a circular shape on the canvas
+    canvas.create_oval(10, 10, 200, 200, outline="lightblue", fill="lightblue", width=0)
+
+    # Bind events to functions
+    drag_area.drop_target_register(DND_FILES)
+    drag_area.dnd_bind('<<Drop>>', lambda event: on_drop(event, dir_label))
+    drag_area.dnd_bind('<<DragEnter>>', lambda event: on_drag_enter())
+    drag_area.dnd_bind('<<DragLeave>>', lambda event: on_drag_leave())
+    drag_area.dnd_bind('<<DragMotion>>', lambda event: on_drag_motion())
 
     # Start the Tkinter event loop
     root.mainloop()
-    
 
 def main():
     # Check the number of command-line arguments
@@ -111,12 +158,9 @@ def main():
         print(f"Error: The specified folder path '{folder_path}' does not exist. Launching GUI.")
         gui()
     else:
-        # Valid arguments. Proceeding to unzipping and font installng without launching GUI.
+        # Valid arguments. Proceeding to unzipping and font installing without launching GUI.
         unzip_files_in_directory(folder_path)
         install_fonts_in_directory(folder_path)
-
-
-
 
 if __name__ == "__main__":
     main()

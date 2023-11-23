@@ -1,19 +1,16 @@
 import os
+import sys
 import ctypes
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from tkinterdnd2 import TkinterDnD, DND_FILES
 from py7zr import SevenZipFile
 from zipfile import ZipFile
-import sys
-def on_drag_enter():
-    print("Drag entered!")
 
-def on_drag_leave():
-    print("Drag left!")
+# To convert the .py file to a .exe file : pyinstaller -F -w install_fonts.py --onefile -i "font.ico" --additional-hooks-dir=.
 
-def on_drag_motion():
-    print("Drag in motion!")
+def show_popup(title, content):
+    messagebox.showinfo(title, content)
 
 def unzip_files_in_directory(directory):
     zip_extensions = (".zip", ".7z") 
@@ -58,9 +55,9 @@ def install_fonts_in_directory(directory):
                     print(f"Installed font: {font_path}")
 
     if nb_fonts_installed == 0:
-        print("No fonts have been installed :(")
+        show_popup("Sad!", "No fonts have been installed :(")
     else:
-        print("We just installed", nb_fonts_installed, "font(s). Awesome!")
+        show_popup("Hey, look!", "We just installed", nb_fonts_installed, "font(s). Awesome!")
 
     # Notify the system that the font cache has changed
     hwnd_broadcast = 0xFFFF
@@ -78,7 +75,7 @@ def choose_folder(label):
         unzip_files_in_directory(folder_path)
         install_fonts_in_directory(folder_path)
     else:
-        print("No folder selected.")
+        show_popup("Oops!", "No folder selected.")
 
 def on_drop(event, label):
     data = event.data
@@ -130,9 +127,6 @@ def gui():
     # Bind events to functions
     drag_area.drop_target_register(DND_FILES)
     drag_area.dnd_bind('<<Drop>>', lambda event: on_drop(event, dir_label))
-    drag_area.dnd_bind('<<DragEnter>>', lambda event: on_drag_enter())
-    drag_area.dnd_bind('<<DragLeave>>', lambda event: on_drag_leave())
-    drag_area.dnd_bind('<<DragMotion>>', lambda event: on_drag_motion())
 
     # Start the Tkinter event loop
     root.mainloop()
